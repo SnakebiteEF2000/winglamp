@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Admin Panel</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                margin: 20px;
+                padding: 10px;
+                background-color: #f0f0f0;
+                display: flex;
+                flex-direction: column;
+                min-height: 100vh;
+            }
+
+            h1 {
+                text-align: center;
+                color: #333;
+            }
+
+            main {
+                flex: 1;
+            }
+
+            form {
+                background-color: #fff;
+                border: 1px solid #ccc;
+                padding: 20px;
+                margin-bottom: 20px;
+                border-radius: 8px;
+            }
+
+            .version {
+                text-align: center;
+                margin-bottom: 10px;
+                color: #666;
+                font-size: 14px;
+            }
+
+            label {
+                font-weight: bold;
+                display: block;
+                margin-bottom: 8px;
+            }
+
+            input[type="text"],
+            input[type="password"],
+            button {
+                width: calc(100% - 20px);
+                padding: 10px;
+                margin-bottom: 10px;
+                border: 1px solid #ccc;
+                border-radius: 4px;
+                font-size: 16px;
+                box-sizing: border-box;
+            }
+
+            button {
+                background-color: #4caf50;
+                color: white;
+                border: none;
+                cursor: pointer;
+            }
+
+            button:hover {
+                background-color: #45a049;
+            }
+
+            .loading-screen {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(255, 255, 255, 0.8);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                font-size: 24px;
+                z-index: 9999; /* Ensure it's above other content */
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Admin Panel</h1>
+
+        <main>
+            <!-- Form for Firmware Update -->
+            <form id="firmwareForm">
+                <div class="version">Version alpha rc1-0.0.5</div>
+                <button type="button" onclick="sendFirmwareUpdate()">
+                    Firmware Update
+                </button>
+            </form>
+
+            <!-- Form for Setting SSID and Password -->
+            <form id="wifiForm">
+                <label for="ssid">SSID:</label>
+                <input type="text" id="ssid" name="ssid" required /><br />
+
+                <label for="password">Password:</label>
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    required
+                /><br />
+
+                <button type="button" onclick="setWifi()">Set</button>
+            </form>
+        </main>
+
+        <!-- JavaScript for handling the requests -->
+        <script>
+            function sendFirmwareUpdate() {
+                showLoadingScreen();
+                fetch("/gitupdate", {
+                    method: "GET",
+                })
+                    .then((response) => {
+                        console.log("Firmware update request sent.");
+                        // Optionally handle response here
+                        reloadAfterDelay();
+                    })
+                    .catch((error) => {
+                        console.error(
+                            "Error sending firmware update request:",
+                            error,
+                        );
+                        reloadAfterDelay();
+                    });
+            }
+
+            function setWifi() {
+                showLoadingScreen();
+                var ssid = document.getElementById("ssid").value;
+                var password = document.getElementById("password").value;
+
+                // Constructing the URL with query parameters
+                var url = `/setwifi?ssid=${encodeURIComponent(ssid)}&password=${encodeURIComponent(password)}`;
+
+                fetch(url, {
+                    method: "GET",
+                })
+                    .then((response) => {
+                        console.log("Wi-Fi settings updated.");
+                        // Optionally handle response here
+                        reloadAfterDelay();
+                    })
+                    .catch((error) => {
+                        console.error("Error updating Wi-Fi settings:", error);
+                        reloadAfterDelay();
+                    });
+            }
+
+            function showLoadingScreen() {
+                // Create a loading screen element
+                var loadingScreen = document.createElement("div");
+                loadingScreen.classList.add("loading-screen");
+                loadingScreen.innerText = "Loading...";
+
+                // Append loading screen to the body
+                document.body.appendChild(loadingScreen);
+            }
+
+            function reloadAfterDelay() {
+                // Simulate a 25-second delay before reloading
+                setTimeout(function () {
+                    window.location.href = "/";
+                }, 25000); // 25 seconds in milliseconds
+            }
+        </script>
+    </body>
+</html>

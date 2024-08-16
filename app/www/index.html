@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lighting Control</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+
+        .container {
+            max-width: 400px;
+            margin: auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        .field {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input[type="color"],
+        input[type="range"],
+        select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .button-container {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .button-container button {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            background-color: #007BFF;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+
+        .button-container button:last-child {
+            margin-bottom: 0;
+        }
+
+        .button-container button:disabled {
+            background-color: #ccc;
+        }
+
+        .button-container button:hover:not(:disabled) {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="field">
+            <label for="color">Select Color</label>
+            <input type="color" id="color" name="color">
+        </div>
+        <div class="field">
+            <label for="brightness">Brightness (0-100)</label>
+            <input type="range" id="brightness" name="brightness" min="0" max="100">
+        </div>
+        <div class="field">
+            <label for="effects">Lighting Effects</label>
+            <select id="effects" name="effects">
+                <option value="">Select an effect</option>
+                <option value="rainbow">rainbow</option>
+                <option value="purple_beam">Purple Beam</option>
+                <option value="effect3">Effect 3</option>
+            </select>
+        </div>
+        <div class="button-container">
+            <button id="setEffectButton">Set Effect</button>
+            <button id="setColorButton">Set Color and Brightness</button>
+        </div>
+    </div>
+
+    <script>
+        function hexToRgb(hex) {
+            let bigint = parseInt(hex.slice(1), 16);
+            let r = (bigint >> 16) & 255;
+            let g = (bigint >> 8) & 255;
+            let b = bigint & 255;
+            return { r: r, g: g, b: b };
+        }
+
+        document.getElementById('setEffectButton').addEventListener('click', function() {
+            const effect = document.getElementById('effects').value;
+            if (effect) {
+                fetch(`/setEffect?effect=${effect}`, { method: 'GET' })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('Effect set:', data);
+                    })
+                    .catch(error => console.error('Error:', error));
+            } else {
+                alert('Please select an effect.');
+            }
+        });
+
+        document.getElementById('setColorButton').addEventListener('click', function() {
+            const colorHex = document.getElementById('color').value;
+            const brightness = document.getElementById('brightness').value;
+            if (colorHex && brightness) {
+                const { r, g, b } = hexToRgb(colorHex);
+                fetch(`/rgb?r=${r}&g=${g}&b=${b}&brightness=${brightness}`, { method: 'GET' })
+                    .then(response => response.json())
+                    .then(data =>{
+                        console.log('Color set:', data);
+
+                    })
+                    .catch(error => console.error('Error:', error))
+            } else {
+                alert('Please select a color and set the brightness.');
+            }
+        });
+    </script>
+</body>
+</html>
