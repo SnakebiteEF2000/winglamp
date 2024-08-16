@@ -15,7 +15,7 @@ LEADER = False
 CONFIG_FILE = 'config.json'
 
 OTA = senko.Senko(
-    user="SnakebiteEF2000", repo="winglamp", files=["www/admin.html","www/index.html", "boot.py", "main.py", "microdot.py", "urlcode.py"]
+    user="SnakebiteEF2000", repo="winglamp",branch="main", files=["www/admin.html","www/index.html", "boot.py", "main.py", "microdot.py", "urlcode.py"]
 )
 color = (50,50,50)
 color2 = (70,70,70)
